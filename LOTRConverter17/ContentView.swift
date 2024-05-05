@@ -110,6 +110,9 @@ struct ContentView: View {
                             .textFieldStyle(.roundedBorder)
                             .focused($leftTyping)
                             .keyboardType(.decimalPad)
+                            .onTapGesture {
+                                leftTyping = true
+                            }
                     }
 
                     // Equal sign
@@ -141,6 +144,10 @@ struct ContentView: View {
                             .textFieldStyle(.roundedBorder)
                             .multilineTextAlignment(.trailing)
                             .focused($rightTyping)
+                            .keyboardType(.decimalPad)
+                            .onTapGesture {
+                                rightTyping = true
+                            }
                     }
                 }
                     .padding()
@@ -204,6 +211,10 @@ struct ContentView: View {
                 }
 
             }
+        }
+        .onTapGesture {
+            leftTyping = false
+            rightTyping = false
         }
     }
 }
