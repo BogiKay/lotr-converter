@@ -60,11 +60,7 @@ struct ContentView: View {
             rightCurrency = Currency.silverPenny
         }
     }
-    
-
-
-
-    
+        
     var body: some View {
         ZStack {
             // Background image
@@ -85,70 +81,16 @@ struct ContentView: View {
 
                 // Currenct conversion section
                 HStack {
-                    // Left conversion
-                    VStack {
-                        // Currency
-                        HStack {
-                            // Currency image
-                            Image(leftCurrency.image)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height: 33)
-                            
-                            // Currency text
-                            Text(leftCurrency.name)
-                                .font(.headline)
-                                .foregroundStyle(.white)
-                        }
-                        .padding(.bottom, -5)
-                        .onTapGesture {
-                            showSelectCurrency.toggle()
-                        }
-                        .popoverTip(CurrencyTip(), arrowEdge: .bottom)
-                        // Text
-                        TextField("Amount", text: $leftAmount)
-                            .textFieldStyle(.roundedBorder)
-                            .focused($leftTyping)
-                            .keyboardType(.decimalPad)
-                            .onTapGesture {
-                                leftTyping = true
-                            }
-                    }
+                    CurrencyField(currency: $leftCurrency, typing: $leftTyping, amount: $leftAmount, showSelectCurrency: $showSelectCurrency, showTip: true)
+                        
 
-                    // Equal sign
                     Image(systemName: "equal")
                         .font(.largeTitle)
                         .foregroundStyle(.white)
                         .symbolEffect(.pulse)
 
-                    // Right conversion
-                    VStack {
-                        // Currency
-                        HStack {
-                            // Currency text
-                            Text(rightCurrency.name)
-                                .font(.headline)
-                                .foregroundStyle(.white)
-                            // Currency image
-                            Image(rightCurrency.image)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height: 33)
-                        }
-                        .padding(.bottom, -5)
-                        .onTapGesture {
-                            showSelectCurrency.toggle()
-                        }
-                        // Text
-                        TextField("Amount", text: $rightAmount)
-                            .textFieldStyle(.roundedBorder)
-                            .multilineTextAlignment(.trailing)
-                            .focused($rightTyping)
-                            .keyboardType(.decimalPad)
-                            .onTapGesture {
-                                rightTyping = true
-                            }
-                    }
+                    CurrencyField(currency: $rightCurrency, typing: $rightTyping, amount: $rightAmount, showSelectCurrency: $showSelectCurrency)
+
                 }
                     .padding()
                     .background(.black.opacity(0.5))
@@ -167,9 +109,6 @@ struct ContentView: View {
                             .foregroundColor(.white)
                             
                     }.padding(.trailing)
-                        .task {
-                            try? Tips.configure()
-                        }
                         .onChange(of: leftAmount) {
                             if (leftTyping) {
                                 rightAmount = leftCurrency.convert(leftAmount, to: rightCurrency)
