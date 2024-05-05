@@ -17,9 +17,53 @@ struct ContentView: View {
     
     @FocusState var leftTyping
     @FocusState var rightTyping
+    
+    @State var leftCurrency: Currency
+    @State var rightCurrency: Currency
+    
+    private var leftCurrencySaved: Currency?
+    private var rightCurrencySaved: Currency?
+    
+    
+    init() {
+        if let storedLeftCurrencyData = UserDefaults.standard.data(forKey: "leftCurrency") {
+            do {
+                let decoder = JSONDecoder()
+                                
+                leftCurrencySaved = try? decoder.decode(Currency.self, from: storedLeftCurrencyData)
+                
+                if leftCurrencySaved != nil {
+                    leftCurrency = leftCurrencySaved ?? Currency.copperPenny
 
-    @State var leftCurrency = Currency.silverPiece
-    @State var rightCurrency = Currency.goldPiece
+                } else {
+                    leftCurrency = Currency.copperPenny
+                }
+                
+            }
+        } else {
+            leftCurrency = Currency.copperPenny
+        }
+        
+        if let storedRightCurrencyData = UserDefaults.standard.data(forKey: "rightCurrency") {
+            do {
+                let decoder = JSONDecoder()
+                
+                rightCurrencySaved = try? decoder.decode(Currency.self, from: storedRightCurrencyData)
+                if rightCurrencySaved != nil {
+                    rightCurrency = rightCurrencySaved ?? Currency.goldPiece
+                } else {
+                    rightCurrency = Currency.silverPenny
+                }
+                
+            }
+        } else {
+            rightCurrency = Currency.silverPenny
+        }
+    }
+    
+
+
+
     
     var body: some View {
         ZStack {
@@ -133,11 +177,22 @@ struct ContentView: View {
                         }
                         .onChange(of: rightCurrency) {
                             rightAmount = leftCurrency.convert(leftAmount, to: rightCurrency)
+                            let encoder = JSONEncoder()
+                            let data = try? encoder.encode(rightCurrency)
                             
+                            if (data != nil) {
+                                UserDefaults.standard.set(data, forKey: "rightCurrency")
+                            }
                         }
                         .onChange(of: leftCurrency) {
                             leftAmount = rightCurrency.convert(rightAmount, to: leftCurrency)
                             
+                            let encoder = JSONEncoder()
+                            let data = try? encoder.encode(leftCurrency)
+                            
+                            if (data != nil) {
+                                UserDefaults.standard.set(data, forKey: "leftCurrency")
+                            }
                         }
                         .sheet(isPresented: $showExchangeInfo, content: {
                             ExchangeInfo()
